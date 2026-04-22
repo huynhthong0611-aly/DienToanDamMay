@@ -64,7 +64,7 @@ exports.login = async (req, res) => {
         // ================== CHECK QUYỀN & REDIRECT =================
         // Nếu là Admin → redirect sang trang admin
         if (user.VaiTro === 'Admin') {
-            return res.redirect('/admin/dashboard');
+            return res.redirect('/admin');
         }
         
         // Nếu là User hoặc Khách hàng → redirect sang home
