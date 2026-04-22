@@ -3,109 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Luxury Jewelry</title>
+    <title>Admin Dashboard - Trang Sức</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
-    <style>
-        body { background-color: #f8f9fa; }
-        .sidebar { background: #2c3e50; color: white; min-height: 100vh; padding: 20px; }
-        .sidebar a { color: #ecf0f1; text-decoration: none; display: block; padding: 10px; margin: 5px 0; border-radius: 5px; }
-        .sidebar a:hover { background: #34495e; }
-        .content { padding: 30px; }
-        .card { box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .stat-box { text-align: center; padding: 20px; background: white; border-radius: 8px; margin: 10px; }
-        .stat-box h3 { color: #d4af37; font-weight: bold; }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
-
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-3 sidebar">
-            <h2 class="text-warning mb-4">Admin Panel</h2>
-            <p class="text-muted">👤 <%= user.HoTen %></p>
-            
-            <hr>
-            
-            <h5 class="text-warning">Menu</h5>
-            <a href="/admin">📊 Dashboard</a>
-            <a href="/admin/users">👥 Quản lý User</a>
-            <a href="/admin/products">📦 Quản lý Sản phẩm</a>
-            <a href="/admin/orders">📋 Quản lý Đơn hàng</a>
-            <a href="/admin/categories">📂 Quản lý Danh mục</a>
-            
-            <hr>
-            
-            <a href="/dangxuat" class="btn btn-danger w-100 mt-3">Đăng xuất</a>
-        </div>
 
-        <!-- Main Content -->
-        <div class="col-md-9">
-            <div class="content">
-                <h1 class="mb-4">
-                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
-                </h1>
+        <%- include('_sidebar', { currentPage: 'dashboard' }) %>
 
-                <!-- Stats Row -->
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="stat-box">
-                            <h3>269</h3>
-                            <p>Sản phẩm</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-box">
-                            <h3>45</h3>
-                            <p>Đơn hàng</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-box">
-                            <h3>328</h3>
-                            <p>Khách hàng</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-box">
-                            <h3>₫125M</h3>
-                            <p>Doanh thu</p>
-                        </div>
+        <!-- CONTENT -->
+        <div class="col-md-9 col-lg-10 content">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-dark"><i class="fas fa-chart-line text-warning"></i> Tổng quan</h2>
+                <span class="text-muted">Ngày: <%= new Date().toLocaleDateString('vi-VN') %></span>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stat-box">
+                        <i class="fas fa-box text-warning"></i>
+                        <h3><%= totalProducts %></h3>
+                        <p class="text-muted mb-0">Sản phẩm</p>
                     </div>
                 </div>
-
-                <!-- Recent Orders -->
-                <div class="card mt-4">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0">📋 Đơn hàng gần đây</h5>
+                <div class="col-md-3">
+                    <div class="stat-box">
+                        <i class="fas fa-shopping-bag text-primary"></i>
+                        <h3><%= totalOrders %></h3>
+                        <p class="text-muted mb-0">Đơn hàng</p>
                     </div>
-                    <div class="card-body">
-                        <table class="table table-striped">
-                            <thead>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-box">
+                        <i class="fas fa-users text-info"></i>
+                        <h3><%= totalUsers %></h3>
+                        <p class="text-muted mb-0">Khách hàng</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-box">
+                        <i class="fas fa-wallet text-success"></i>
+                        <h3><%= (totalRevenue / 1000000).toFixed(1) %>M</h3>
+                        <p class="text-muted mb-0">Doanh thu (VNĐ)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="card">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-history text-warning me-2"></i> Đơn hàng gần đây</h5>
+                    <a href="/admin/orders" class="btn btn-sm btn-outline-warning">Xem tất cả</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>ID Đơn hàng</th>
+                                    <th class="ps-4">Mã ĐH</th>
                                     <th>Khách hàng</th>
+                                    <th>Ngày đặt</th>
                                     <th>Tổng tiền</th>
                                     <th>Trạng thái</th>
-                                    <th>Ngày đặt</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>#HD001</td>
-                                    <td>Nguyễn Văn A</td>
-                                    <td>₫2,500,000</td>
-                                    <td><span class="badge bg-warning">Chờ xử lý</span></td>
-                                    <td>22/04/2026</td>
-                                </tr>
-                                <tr>
-                                    <td>#HD002</td>
-                                    <td>Trần Thị B</td>
-                                    <td>₫1,800,000</td>
-                                    <td><span class="badge bg-success">Đã giao</span></td>
-                                    <td>21/04/2026</td>
-                                </tr>
+                                <% if(recentOrders && recentOrders.length > 0) { %>
+                                    <% recentOrders.forEach(order => { %>
+                                        <tr>
+                                            <td class="ps-4 fw-bold text-primary">#<%= order.IdHoaDon %></td>
+                                            <td>
+                                                <div class="fw-bold"><%= order.HoTenKhachHang %></div>
+                                                <small class="text-muted"><%= order.SoDienThoai %></small>
+                                            </td>
+                                            <td><%= new Date(order.NgayLap).toLocaleDateString('vi-VN') %></td>
+                                            <td class="fw-bold text-danger"><%= order.TongTien.toLocaleString('vi-VN') %>đ</td>
+                                            <td>
+                                                <% if(order.TrangThai === 'Đã giao') { %>
+                                                    <span class="badge bg-success rounded-pill px-3"><i class="fas fa-check me-1"></i>Đã giao</span>
+                                                <% } else if(order.TrangThai === 'Đang giao') { %>
+                                                    <span class="badge bg-primary rounded-pill px-3"><i class="fas fa-truck me-1"></i>Đang giao</span>
+                                                <% } else if(order.TrangThai === 'Đã hủy') { %>
+                                                    <span class="badge bg-danger rounded-pill px-3"><i class="fas fa-times me-1"></i>Đã hủy</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-warning text-dark rounded-pill px-3"><i class="fas fa-clock me-1"></i>Chờ xử lý</span>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr><td colspan="5" class="text-center py-4 text-muted">Chưa có đơn hàng nào</td></tr>
+                                <% } %>
                             </tbody>
                         </table>
                     </div>
@@ -114,7 +107,6 @@
         </div>
     </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

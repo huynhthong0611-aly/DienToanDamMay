@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tồn kho - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .stock-ok    { color: #27ae60; font-weight: 700; }
+        .stock-low   { color: #f39c12; font-weight: 700; }
+        .stock-out   { color: #e74c3c; font-weight: 700; }
+        .badge-ok    { background:#d5f5e3; color:#1e8449; }
+        .badge-low   { background:#fef9e7; color:#d35400; }
+        .badge-out   { background:#fdedec; color:#c0392b; }
+        .stat-inv    { border-radius:12px; padding:20px 24px; display:flex; align-items:center; gap:16px; background:white; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+        .stat-inv i  { font-size:2rem; width:48px; text-align:center; }
+        .qty-input   { width:70px; text-align:center; padding:4px 6px; border:1px solid #dee2e6; border-radius:6px; font-size:.85rem; }
+        .import-input{ width:70px; text-align:center; padding:4px 6px; border:1px solid #dee2e6; border-radius:6px; font-size:.85rem; }
+        .filter-btn.active-filter { background:#d4af37; color:#fff; border-color:#d4af37; }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+
+        <%- include('_sidebar', { currentPage: 'inventory' }) %>
+
+        <div class="col-md-9 col-lg-10 content">
+
+            <!-- HEADER -->
+            <div class="page-header mb-3">
+                <h2 class="fw-bold"><i class="fas fa-warehouse text-warning me-2"></i>Quản lý Tồn kho</h2>
+            </div>
+
+            <!-- ALERTS -->
+            <% const s = (typeof query !== 'undefined' && query) ? query.success : null; %>
+            <% const e = (typeof query !== 'undefined' && query) ? query.error : null; %>
+            <script>
+                const urlP = new URLSearchParams(window.location.search);
+                const sv = urlP.get('success'), ev = urlP.get('error');
+                if (sv === 'update') document.write('<div class="alert alert-success alert-dismissible fade show"><i class="fas fa-check-circle me-2"></i>Cập nhật tồn kho thành công!<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+                if (sv === 'import') document.write('<div class="alert alert-success alert-dismissible fade show"><i class="fas fa-check-circle me-2"></i>Nhập hàng thành công!<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+                if (ev) document.write('<div class="alert alert-danger alert-dismissible fade show"><i class="fas fa-exclamation-circle me-2"></i>Vui lòng nhập số lượng hợp lệ!<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+            </script>
+
+            <!-- STATS ROW -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <div class="stat-inv">
+                        <i class="fas fa-boxes text-primary"></i>
+                        <div>
+                            <div class="fw-bold fs-5"><%= stats.total_products %></div>
+                            <div class="text-muted" style="font-size:.8rem;">Sản phẩm có kho</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-inv">
+                        <i class="fas fa-cubes text-info"></i>
+                        <div>
+                            <div class="fw-bold fs-5"><%= stats.total_quantity.toLocaleString('vi-VN') %></div>
+                            <div class="text-muted" style="font-size:.8rem;">Tổng tồn kho</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-inv">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        <div>
+                            <div class="fw-bold fs-5 text-warning"><%= stats.low_stock %></div>
+                            <div class="text-muted" style="font-size:.8rem;">Sắp hết hàng (≤5)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-inv">
+                        <i class="fas fa-times-circle text-danger"></i>
+                        <div>
+                            <div class="fw-bold fs-5 text-danger"><%= stats.out_of_stock %></div>
+                            <div class="text-muted" style="font-size:.8rem;">Hết hàng</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEARCH & FILTER -->
+            <div class="card mb-4">
+                <div class="card-body py-3">
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <!-- Search -->
+                        <form method="GET" action="/admin/inventory" class="d-flex gap-2 flex-grow-1">
+                            <input type="hidden" name="filter" value="<%= filter %>">
+                            <input type="text" name="search" class="form-control" style="max-width:280px;"
+                                   placeholder="Tìm tên sản phẩm, size..."
+                                   value="<%= search %>">
+                            <button class="btn btn-outline-secondary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <% if (search) { %>
+                                <a href="/admin/inventory?filter=<%= filter %>" class="btn btn-outline-danger">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            <% } %>
+                        </form>
+
+                        <!-- Filter buttons -->
+                        <div class="d-flex gap-1">
+                            <a href="/admin/inventory?filter=all&search=<%= search %>"
+                               class="btn btn-sm btn-outline-secondary filter-btn <%= filter === 'all' ? 'active-filter' : '' %>">
+                                Tất cả (<%= stats.total_variants %>)
+                            </a>
+                            <a href="/admin/inventory?filter=out&search=<%= search %>"
+                               class="btn btn-sm btn-outline-danger filter-btn <%= filter === 'out' ? 'active-filter' : '' %>">
+                                <i class="fas fa-times-circle"></i> Hết hàng (<%= stats.out_of_stock %>)
+                            </a>
+                            <a href="/admin/inventory?filter=low&search=<%= search %>"
+                               class="btn btn-sm btn-outline-warning filter-btn <%= filter === 'low' ? 'active-filter' : '' %>">
+                                <i class="fas fa-exclamation-triangle"></i> Sắp hết (<%= stats.low_stock %>)
+                            </a>
+                            <a href="/admin/inventory?filter=ok&search=<%= search %>"
+                               class="btn btn-sm btn-outline-success filter-btn <%= filter === 'ok' ? 'active-filter' : '' %>">
+                                <i class="fas fa-check"></i> Còn hàng
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size:.88rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3" style="width:50px;">Ảnh</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th style="width:80px;">Size</th>
+                                    <th style="width:120px;">Tồn kho</th>
+                                    <th style="width:180px;">Cập nhật SL</th>
+                                    <th style="width:200px;">Nhập thêm hàng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (variants && variants.length > 0) { %>
+                                    <% variants.forEach(v => { %>
+                                        <tr>
+                                            <!-- ẢNH -->
+                                            <td class="ps-3">
+                                                <% if (v.hinh_anh) { %>
+                                                    <img src="/image/<%= v.hinh_anh %>"
+                                                         width="40" height="40"
+                                                         class="rounded border"
+                                                         style="object-fit:cover;"
+                                                         onerror="this.src='/image/default.jpg'">
+                                                <% } else { %>
+                                                    <div class="rounded border bg-light d-flex align-items-center justify-content-center"
+                                                         style="width:40px;height:40px;">
+                                                        <i class="fas fa-gem text-muted"></i>
+                                                    </div>
+                                                <% } %>
+                                            </td>
+
+                                            <!-- TÊN SẢN PHẨM -->
+                                            <td>
+                                                <div class="fw-semibold text-truncate" style="max-width:220px;" title="<%= v.ten_sp %>">
+                                                    <%= v.ten_sp %>
+                                                </div>
+                                                <small class="text-muted">ID: <%= v.san_pham_id %></small>
+                                            </td>
+
+                                            <!-- SIZE -->
+                                            <td>
+                                                <span class="badge bg-light text-dark border"><%= v.kich_co || '—' %></span>
+                                            </td>
+
+                                            <!-- TỒN KHO -->
+                                            <td>
+                                                <% if (v.so_luong === 0) { %>
+                                                    <span class="badge badge-out px-2 py-1 rounded-pill">
+                                                        <i class="fas fa-times-circle me-1"></i>Hết hàng
+                                                    </span>
+                                                <% } else if (v.so_luong <= 5) { %>
+                                                    <span class="badge badge-low px-2 py-1 rounded-pill">
+                                                        <i class="fas fa-exclamation-triangle me-1"></i><%= v.so_luong %> còn lại
+                                                    </span>
+                                                <% } else { %>
+                                                    <span class="badge badge-ok px-2 py-1 rounded-pill">
+                                                        <i class="fas fa-check me-1"></i><%= v.so_luong %>
+                                                    </span>
+                                                <% } %>
+                                            </td>
+
+                                            <!-- CẬP NHẬT SỐ LƯỢNG -->
+                                            <td>
+                                                <form method="POST" action="/admin/inventory/update/<%= v._id %>"
+                                                      class="d-flex gap-1 align-items-center">
+                                                    <input type="number" name="so_luong" class="qty-input"
+                                                           value="<%= v.so_luong %>" min="0" max="9999">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary"
+                                                            title="Cập nhật">
+                                                        <i class="fas fa-save"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+
+                                            <!-- NHẬP THÊM -->
+                                            <td>
+                                                <form method="POST" action="/admin/inventory/import/<%= v._id %>"
+                                                      class="d-flex gap-1 align-items-center">
+                                                    <span class="text-muted" style="font-size:.78rem;">+</span>
+                                                    <input type="number" name="so_luong_nhap" class="import-input"
+                                                           placeholder="Số lượng" min="1" max="9999">
+                                                    <button type="submit" class="btn btn-sm btn-success"
+                                                            title="Nhập hàng">
+                                                        <i class="fas fa-plus"></i> Nhập
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5 text-muted">
+                                            <i class="fas fa-boxes fa-3x mb-3 d-block opacity-25"></i>
+                                            Không tìm thấy sản phẩm nào
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <% if (variants && variants.length > 0) { %>
+                    <div class="card-footer text-muted py-2" style="font-size:.82rem;">
+                        Hiển thị <strong><%= variants.length %></strong> biến thể
+                        <% if (search) { %> — Tìm kiếm: "<strong><%= search %></strong>"<% } %>
+                    </div>
+                <% } %>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

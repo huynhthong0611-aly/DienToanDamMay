@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Đơn hàng #<%= order.IdHoaDon %> - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+
+        <%- include('_sidebar', { currentPage: 'orders' }) %>
+
+        <!-- CONTENT -->
+        <div class="col-md-9 col-lg-10 content">
+
+            <div class="page-header">
+                <h2 class="fw-bold">
+                    <i class="fas fa-receipt text-primary me-2"></i>
+                    Chi tiết Đơn hàng <span class="text-primary">#<%= order.IdHoaDon %></span>
+                </h2>
+                <a href="/admin/orders" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
+
+            <% if (typeof query !== 'undefined' && query && query.success) { %>
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="fas fa-check-circle me-2"></i>Cập nhật trạng thái thành công!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+
+            <div class="row g-4">
+
+                <!-- CỘT TRÁI: Thông tin đơn hàng + Cập nhật trạng thái -->
+                <div class="col-lg-5">
+
+                    <!-- Thông tin đơn hàng -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex align-items-center gap-2"
+                             style="background:#3498db; color:white;">
+                            <i class="fas fa-file-invoice"></i>
+                            <span class="fw-bold">Thông tin đơn hàng</span>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-borderless mb-0" style="font-size:0.9rem;">
+                                <tr>
+                                    <td class="text-muted fw-semibold" width="40%">Mã đơn</td>
+                                    <td class="fw-bold text-primary">#<%= order.IdHoaDon %></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Ngày đặt</td>
+                                    <td><%= new Date(order.NgayLap).toLocaleDateString('vi-VN') %></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Tổng tiền</td>
+                                    <td class="fw-bold text-danger fs-6"><%= order.TongTien.toLocaleString('vi-VN') %>₫</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Thanh toán</td>
+                                    <td><span class="badge bg-secondary"><%= order.PhuongThucThanhToan %></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Trạng thái</td>
+                                    <td>
+                                        <% if (order.TrangThai === 'Đã giao') { %>
+                                            <span class="badge bg-success rounded-pill px-3"><i class="fas fa-check me-1"></i>Đã giao</span>
+                                        <% } else if (order.TrangThai === 'Đang giao') { %>
+                                            <span class="badge bg-primary rounded-pill px-3"><i class="fas fa-truck me-1"></i>Đang giao</span>
+                                        <% } else if (order.TrangThai === 'Đã hủy' || order.TrangThai === 'Hủy') { %>
+                                            <span class="badge bg-danger rounded-pill px-3"><i class="fas fa-times me-1"></i>Đã hủy</span>
+                                        <% } else { %>
+                                            <span class="badge bg-warning text-dark rounded-pill px-3"><i class="fas fa-clock me-1"></i>Chờ xử lý</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Cập nhật trạng thái -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex align-items-center gap-2"
+                             style="background:#1abc9c; color:white;">
+                            <i class="fas fa-sync-alt"></i>
+                            <span class="fw-bold">Cập nhật Trạng thái</span>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="/admin/orders/<%= order._id %>/status">
+                                <select class="form-select mb-3" name="TrangThai" required>
+                                    <option value="Chờ xử lý" <%= order.TrangThai === 'Chờ xử lý' ? 'selected' : '' %>>⏳ Chờ xử lý</option>
+                                    <option value="Đang giao"  <%= order.TrangThai === 'Đang giao'  ? 'selected' : '' %>>🚚 Đang giao</option>
+                                    <option value="Đã giao"   <%= order.TrangThai === 'Đã giao'   ? 'selected' : '' %>>✅ Đã giao</option>
+                                    <option value="Đã hủy"    <%= (order.TrangThai === 'Hủy' || order.TrangThai === 'Đã hủy') ? 'selected' : '' %>>❌ Hủy đơn</option>
+                                </select>
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-save me-1"></i> Lưu trạng thái
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Xóa đơn hàng -->
+                    <a href="/admin/orders/delete/<%= order._id %>"
+                       class="btn btn-outline-danger w-100"
+                       onclick="return confirm('Chắc chắn xóa đơn hàng #<%= order.IdHoaDon %>?')">
+                        <i class="fas fa-trash me-1"></i> Xóa đơn hàng
+                    </a>
+                </div>
+
+                <!-- CỘT PHẢI: Thông tin khách + Sản phẩm -->
+                <div class="col-lg-7">
+
+                    <!-- Thông tin khách hàng -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex align-items-center gap-2"
+                             style="background:#27ae60; color:white;">
+                            <i class="fas fa-user"></i>
+                            <span class="fw-bold">Thông tin Khách hàng</span>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-borderless mb-0" style="font-size:0.9rem;">
+                                <tr>
+                                    <td class="text-muted fw-semibold" width="35%">Họ tên</td>
+                                    <td class="fw-bold"><%= order.HoTenKhachHang %></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Email</td>
+                                    <td><%= order.Email || '—' %></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Điện thoại</td>
+                                    <td><%= order.SoDienThoai %></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Địa chỉ</td>
+                                    <td><%= order.DiaChi %></td>
+                                </tr>
+                                <% if (order.GhiChu) { %>
+                                <tr>
+                                    <td class="text-muted fw-semibold">Ghi chú</td>
+                                    <td class="text-warning"><%= order.GhiChu %></td>
+                                </tr>
+                                <% } %>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Chi tiết sản phẩm trong đơn -->
+                    <div class="card">
+                        <div class="card-header d-flex align-items-center gap-2"
+                             style="background:#f39c12; color:white;">
+                            <i class="fas fa-box-open"></i>
+                            <span class="fw-bold">Sản phẩm trong đơn</span>
+                            <% if(items && items.length > 0) { %>
+                                <span class="badge bg-white text-dark ms-auto"><%= items.length %> sản phẩm</span>
+                            <% } %>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" style="font-size:0.88rem;">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="ps-3">#</th>
+                                            <th>Tên sản phẩm</th>
+                                            <th>Kích cỡ</th>
+                                            <th class="text-center">SL</th>
+                                            <th class="text-end">Đơn giá</th>
+                                            <th class="text-end pe-3">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (items && items.length > 0) { %>
+                                            <% items.forEach((item, index) => {
+                                                const donGia = item.DonGia || 0;
+                                                const soLuong = item.SoLuong || 1;
+                                                const thanhTien = item.ThanhTien || (donGia * soLuong);
+                                            %>
+                                                <tr>
+                                                    <td class="ps-3 text-muted"><%= index + 1 %></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <% if (item.HinhAnh) { %>
+                                                                <img src="/image/<%= item.HinhAnh %>"
+                                                                     width="40" height="40"
+                                                                     class="rounded border"
+                                                                     style="object-fit:cover;"
+                                                                     onerror="this.style.display='none'">
+                                                            <% } %>
+                                                            <span class="fw-semibold"><%= item.TenSanPham || 'Sản phẩm' %></span>
+                                                        </div>
+                                                    </td>
+                                                    <td><%= item.KichThuoc || '—' %></td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-light text-dark border"><%= soLuong %></span>
+                                                    </td>
+                                                    <td class="text-end"><%= donGia.toLocaleString('vi-VN') %>₫</td>
+                                                    <td class="text-end pe-3 fw-bold text-danger"><%= thanhTien.toLocaleString('vi-VN') %>₫</td>
+                                                </tr>
+                                            <% }) %>
+                                            <tr class="table-warning">
+                                                <td colspan="5" class="text-end fw-bold pe-3">TỔNG CỘNG:</td>
+                                                <td class="text-end pe-3 fw-bold text-danger fs-6"><%= order.TongTien.toLocaleString('vi-VN') %>₫</td>
+                                            </tr>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="6" class="text-center py-4 text-muted">
+                                                    <i class="fas fa-box-open fa-2x mb-2 d-block"></i>
+                                                    Không có chi tiết sản phẩm
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

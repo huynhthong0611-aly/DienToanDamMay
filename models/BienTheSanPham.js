@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const bientheSanphamSchema = new mongoose.Schema({
   id: { type: Number, required: true, unique: true },
   san_pham_id: { type: Number, ref: 'Sanpham', required: true, index: true },
-  kich_co: { type: String },
+  kich_co: { type: mongoose.Schema.Types.Mixed },
   so_luong: { type: Number, required: true, default: 0 }
 }, {
   collection: 'bien_the_san_pham'

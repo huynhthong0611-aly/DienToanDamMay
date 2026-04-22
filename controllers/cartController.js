@@ -31,7 +31,7 @@ exports.addToCart = async (req, res) => {
         const qty = Number(quantity) || 1;
 
         const allVariants = await BienThe.find({ san_pham_id: pId });
-        const variant = allVariants.find(v => String(v.kich_co).trim() === String(size).trim());
+        const variant = allVariants.find(v => String(v.kich_co || "").trim() === String(size || "").trim());
 
         if (!variant) return res.send("Không tìm thấy kích cỡ này.");
 

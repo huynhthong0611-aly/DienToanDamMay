@@ -1,59 +1,169 @@
+/* ===================================
+   ADMIN PANEL - SHARED CSS
+   =================================== */
 
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Main content area */
-.main-content {
-    margin-left: 270px; /* Đảm bảo khoảng cách với sidebar */
-    padding: 20px;
-    transition: margin-left 0.3s ease; /* Điều chỉnh khi sidebar thay đổi kích thước */
+* { box-sizing: border-box; }
+
+body {
+    background-color: #f0f2f5;
+    font-family: 'Inter', sans-serif;
 }
 
-/* Điều chỉnh các thẻ card cho đẹp hơn */
-.card {
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
+/* ===== SIDEBAR ===== */
+.sidebar {
+    background: linear-gradient(180deg, #1a252f 0%, #2c3e50 100%);
+    color: white;
+    min-height: 100vh;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
+/* Scrollbar trong sidebar */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
 
-.card-body {
-    padding: 20px;
-    text-align: center;
-}
-
-.card-title {
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin-bottom: 10px;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-    border-radius: 4px;
-    padding: 8px 16px;
-    font-size: 1rem;
-    text-align: center;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #004085;
-}
-
-/* Đảm bảo các cột card luôn đồng đều */
-.row > .col-md-4 {
+/* Nav links */
+.nav-link-item {
     display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
+    align-items: center;
+    gap: 10px;
+    color: #b2bec3;
+    text-decoration: none;
+    padding: 10px 14px;
+    margin: 2px 0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
 }
 
-/* Đảm bảo phần nội dung không bị lệch */
-.container-fluid {
-    padding-left: 20px;
-    padding-right: 20px;
+.nav-link-item:hover {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    border-left-color: rgba(212,175,55,0.5);
+}
+
+.nav-link-item.active {
+    background: rgba(212,175,55,0.18);
+    color: #f0c040;
+    border-left-color: #d4af37;
+    font-weight: 600;
+}
+
+.nav-link-item i {
+    width: 18px;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+/* ===== CONTENT AREA ===== */
+.content {
+    padding: 28px 32px;
+    min-height: 100vh;
+}
+
+/* Page header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.page-header h2 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+/* ===== CARDS ===== */
+.card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border: none;
+    border-radius: 12px;
+}
+
+.card-header {
+    border-radius: 12px 12px 0 0 !important;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* ===== STAT BOXES (Dashboard) ===== */
+.stat-box {
+    text-align: center;
+    padding: 24px 20px;
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-top: 3px solid transparent;
+}
+
+.stat-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.stat-box i {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.stat-box h3 {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 2rem;
+    margin: 0 0 4px;
+}
+
+.stat-box p {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+/* ===== TABLE ===== */
+.table th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #7f8c8d;
+    font-weight: 600;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.table td {
+    vertical-align: middle;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.table tbody tr:hover { background: #f8f9ff; }
+
+/* ===== BUTTONS ===== */
+.btn { font-weight: 500; border-radius: 8px; }
+.btn-sm { font-size: 0.8rem; }
+
+/* ===== ALERTS ===== */
+.alert { border-radius: 10px; border: none; font-size: 0.9rem; }
+
+/* ===== FORM ===== */
+.form-label { font-weight: 600; font-size: 0.88rem; color: #495057; }
+.form-control, .form-select {
+    border-radius: 8px;
+    border-color: #dee2e6;
+    font-size: 0.9rem;
+}
+.form-control:focus, .form-select:focus {
+    border-color: #d4af37;
+    box-shadow: 0 0 0 0.2rem rgba(212,175,55,0.15);
 }

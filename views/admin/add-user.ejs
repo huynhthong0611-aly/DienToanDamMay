@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm User - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+
+        <%- include('_sidebar', { currentPage: 'users' }) %>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 content">
+            <div class="page-header">
+                <h2 class="fw-bold"><i class="fas fa-user-plus text-success me-2"></i>Thêm User Mới</h2>
+                <a href="/admin/users" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
+
+
+            <div class="card">
+                <div class="card-body">
+                    <% if (typeof error !== 'undefined') { %>
+                        <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> <%= error %></div>
+                    <% } %>
+
+                    <form method="POST" action="/admin/users/add" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Avatar</label>
+                            <input type="file" class="form-control" name="anh_dai_dien" accept="image/*">
+                            <small class="text-muted">Tối đa 5MB, định dạng: jpg, png, gif</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Họ Tên *</label>
+                            <input type="text" class="form-control" name="HoTen" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-control" name="Email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu *</label>
+                            <input type="password" class="form-control" name="MatKhau" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Vai trò *</label>
+                            <select class="form-select" name="VaiTro" required>
+                                <option value="Khách hàng">Khách hàng</option>
+                                <option value="User">User</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" name="SoDienThoai">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Địa chỉ</label>
+                            <textarea class="form-control" name="DiaChi" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="/admin/users" class="btn btn-secondary"><i class="fas fa-times"></i> Hủy</a>
+                            <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Thêm User</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

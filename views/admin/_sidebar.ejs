@@ -1,0 +1,71 @@
+<!-- ===== ADMIN SIDEBAR ===== -->
+<div class="col-md-3 col-lg-2 sidebar d-flex flex-column">
+
+    <!-- LOGO -->
+    <div class="text-center pt-4 pb-2">
+        <i class="fas fa-gem fa-2x text-warning"></i>
+        <div class="text-warning fw-bold mt-1" style="font-size:1.1rem; letter-spacing:1px;">ADMIN PANEL</div>
+    </div>
+
+    <!-- USER INFO - NỔI BẬT Ở TRÊN -->
+    <div class="user-card mx-3 mb-3 p-3 rounded-3" style="background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.3);">
+        <div class="d-flex align-items-center gap-2">
+            <img src="/image/<%= (typeof user !== 'undefined' && user && user.anh_dai_dien) ? user.anh_dai_dien : 'default.jpg' %>"
+                 class="rounded-circle border border-warning"
+                 width="42" height="42"
+                 style="object-fit:cover; border-width:2px!important;">
+            <div class="overflow-hidden">
+                <div class="fw-bold text-white text-truncate" style="font-size:0.95rem;">
+                    <%= (typeof user !== 'undefined' && user) ? user.HoTen : 'Admin' %>
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                    <span style="width:7px;height:7px;background:#2ecc71;border-radius:50%;display:inline-block;"></span>
+                    <small class="text-success" style="font-size:0.75rem;">Online · Admin</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="border-secondary mx-3 my-0">
+
+    <!-- NAV MENU -->
+    <nav class="flex-grow-1 px-2 pt-2">
+        <p class="text-uppercase px-2 mb-2" style="font-size:0.7rem;color:#7f8c8d;letter-spacing:1.5px;">Quản lý</p>
+
+        <a href="/admin"
+           class="nav-link-item <%= (typeof currentPage !== 'undefined' && currentPage === 'dashboard') ? 'active' : '' %>">
+            <i class="fas fa-tachometer-alt fa-fw"></i> Dashboard
+        </a>
+        <a href="/admin/users"
+           class="nav-link-item <%= (typeof currentPage !== 'undefined' && currentPage === 'users') ? 'active' : '' %>">
+            <i class="fas fa-users fa-fw"></i> Người dùng
+        </a>
+        <a href="/admin/products"
+           class="nav-link-item <%= (typeof currentPage !== 'undefined' && currentPage === 'products') ? 'active' : '' %>">
+            <i class="fas fa-box-open fa-fw"></i> Sản phẩm
+        </a>
+        <a href="/admin/orders"
+           class="nav-link-item <%= (typeof currentPage !== 'undefined' && currentPage === 'orders') ? 'active' : '' %>">
+            <i class="fas fa-shopping-cart fa-fw"></i> Đơn hàng
+        </a>
+        <a href="/admin/categories"
+           class="nav-link-item <%= (typeof currentPage !== 'undefined' && currentPage === 'categories') ? 'active' : '' %>">
+            <i class="fas fa-tags fa-fw"></i> Danh mục
+        </a>
+        <a href="/admin/inventory"
+           class="nav-link-item <%= (typeof currentPage !== 'undefined' && currentPage === 'inventory') ? 'active' : '' %>">
+            <i class="fas fa-warehouse fa-fw"></i> Tồn kho
+        </a>
+    </nav>
+
+    <!-- FOOTER LINKS -->
+    <div class="px-3 pb-4 pt-2">
+        <hr class="border-secondary mb-3">
+        <a href="/" class="nav-link-item text-info">
+            <i class="fas fa-store fa-fw"></i> Về cửa hàng
+        </a>
+        <a href="/dangxuat" class="nav-link-item text-danger mt-1">
+            <i class="fas fa-sign-out-alt fa-fw"></i> Đăng xuất
+        </a>
+    </div>
+</div>

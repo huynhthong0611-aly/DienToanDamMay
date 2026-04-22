@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Sản phẩm - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+
+        <%- include('_sidebar', { currentPage: 'products' }) %>
+
+        <!-- CONTENT -->
+        <div class="col-md-9 col-lg-10 content">
+            <div class="page-header">
+                <h2 class="fw-bold"><i class="fas fa-plus-circle text-success me-2"></i>Thêm Sản phẩm Mới</h2>
+                <a href="/admin/products" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-body p-4">
+                    <% if (typeof error !== 'undefined' && error) { %>
+                        <div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i><%= error %></div>
+                    <% } %>
+
+                    <form method="POST" action="/admin/products/add">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">ID Sản phẩm <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="id" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Mã SP <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="ma_sp" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="ten_sp" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Giá bán <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="gia" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Giá khuyến mãi</label>
+                                <input type="number" class="form-control" name="gia_khuyen_mai" value="0">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Danh mục ID <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="danh_muc_id" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Thương hiệu ID</label>
+                                <input type="number" class="form-control" name="thuong_hieu_id">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Chất liệu</label>
+                                <input type="text" class="form-control" name="chat_lieu" placeholder="VD: Vàng 14k">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Đá chính</label>
+                                <input type="text" class="form-control" name="da_chinh" placeholder="VD: Kim cương">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Trạng thái</label>
+                                <select class="form-select" name="trang_thai">
+                                    <option value="1" selected>Đang bán</option>
+                                    <option value="0">Tạm ẩn</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Trọng lượng (gram)</label>
+                                <input type="number" step="0.1" class="form-control" name="trong_luong">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Mô tả</label>
+                                <textarea class="form-control" name="mo_ta" rows="4"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end mt-4">
+                            <a href="/admin/products" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>Hủy
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-1"></i>Thêm Sản phẩm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
