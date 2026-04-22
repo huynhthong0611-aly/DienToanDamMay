@@ -80,6 +80,8 @@ const timkiemRouter = require("./routers/timkiemRouter");
 const trangsucRouter = require("./routers/trangsucRouter");
 const thanhtoanRouter = require("./routers/thanhtoanRouter");
 const profileRouter = require('./routers/profileRouter');
+const adminRouter = require('./routers/adminRouter');
+app.use('/admin', adminRouter);  // ← THÊM ADMIN ROUTER
 app.use('/', profileRouter);
 app.use("/", thanhtoanRouter);
 app.use("/", trangsucRouter);
