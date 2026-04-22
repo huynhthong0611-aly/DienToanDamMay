@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập Luxury</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+
+<body class="login-page">
+
+<div class="login-container">
+    <h2>LUXURY LOGIN</h2>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+        <p style="color:red; text-align:center;"><%= error %></p>
+    <% } %>
+
+    <form method="POST" action="/login">
+
+        <!-- ⭐ EMAIL GỢI Ý -->
+        <div class="input-group">
+            <input type="email"
+                   name="email"
+                   placeholder="Email"
+                   value="<%= typeof lastEmail !== 'undefined' ? lastEmail : '' %>"
+                   required>
+        </div>
+
+        <div class="input-group">
+            <input type="password"
+                   name="password"
+                   placeholder="Mật khẩu"
+                   required>
+        </div>
+
+        <button type="submit">Đăng nhập</button>
+    </form>
+
+    <p class="register-link">
+        Chưa có tài khoản? <a href="/dangky">Đăng ký ngay</a>
+    </p>
+</div>
+
+</body>
+</html>

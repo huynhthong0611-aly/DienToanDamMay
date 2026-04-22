@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký</title>
+    <link rel="stylesheet" href="../css/login.css">
+</head>
+
+<body class="login-page">
+
+<div class="login-container">
+    <h2>LUXURY REGISTRATION</h2>
+
+    <form method="POST" action="">
+       <input type="text" name="HoTen" placeholder="Họ tên" required>
+
+        <input type="email" name="Email" placeholder="Email" required>
+
+        <input type="password" name="MatKhau" placeholder="Mật khẩu" required>
+        <input type="password" name="xacthucmatkhau" placeholder="Xác nhận mật khẩu" required>
+
+        <button type="submit" name="dangky">Đăng ký</button>
+    </form>
+
+    <p>Đã có tài khoản? <a href="/login">Đăng nhập ngay</a></p>
+    <a href="/" class="back-home">← Về trang chủ</a>
+</div>
+
+<% if (error) { %>
+    <script>
+        alert("<%= error %>");
+    </script>
+<% } %>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bộ Sưu Tập Trang Sức Cao Cấp</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/trangsuc.css">
+</head>
+
+<body>
+    <%- include('menu') %>
+
+    <div class="container mt-5 pt-4">
+        <div class="text-center mb-5">
+            <h1 class="collection-title text-uppercase">Sản Phẩm Mới Nhất</h1>
+        </div>
+
+        <div class="row">
+            <% if (products && products.length > 0) { %>
+                <% products.forEach(function(row) { %>
+
+                    <div class="col-6 col-md-4 col-lg-3 mb-4">
+
+                        <!-- FIX: dùng route params -->
+                        <a href="/chitiet/<%= row._id %>" class="product-link">
+
+                            <div class="card h-100 product-card shadow-sm">
+
+                                <div class="img-wrapper">
+                                    <img src="/image/<%= row.hinh_anh %>" 
+                                         alt="<%= row.ten_sp %>" 
+                                         loading="lazy">
+                                </div>
+
+                                <div class="card-body text-center">
+                                    <h5 class="product-name"><%= row.ten_sp %></h5>
+
+                                    <p class="product-price">
+                                        <%= Number(row.gia).toLocaleString('vi-VN') %> VNĐ
+                                    </p>
+                                </div>
+
+                            </div>
+                        </a>
+                    </div>
+
+                <% }) %>
+            <% } else { %>
+                <p class="text-center">Không có sản phẩm nào.</p>
+            <% } %>
+        </div>
+    </div>
+
+    <%- include('footer') %>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Jewelry</title>
+
+    <link rel="stylesheet" href="/css/menu.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container-fluid">
+
+        <a class="navbar-brand fw-bold text-danger" href="/">
+            <i class="bi bi-gem"></i> Luxury Jewelry
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <!-- SEARCH -->
+            <form class="d-flex ms-auto me-3" action="/timkiem" method="GET">
+                <div class="input-group">
+                    <input class="form-control" type="search" name="keyword" placeholder="Tìm sản phẩm..." required>
+                    <button class="btn btn-outline-dark" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
+
+            <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Trang chủ</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/thongtin">Thông tin</a>
+                </li>
+
+                <!-- DROPDOWN -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        Sản phẩm
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/sanpham?danh_muc_id=1">Nhẫn</a></li>
+                        <li><a class="dropdown-item" href="/sanpham?danh_muc_id=2">Dây chuyền</a></li>
+                        <li><a class="dropdown-item" href="/sanpham?danh_muc_id=3">Bông tai</a></li>
+                        <li><a class="dropdown-item" href="/sanpham?danh_muc_id=4">Vòng tay</a></li>
+                        <li><a class="dropdown-item" href="/sanpham?danh_muc_id=12">Charm</a></li>
+                        <li><a class="dropdown-item" href="/sanpham?danh_muc_id=5">Bộ trang sức</a></li>
+                        <li><a class="dropdown-item" href="/sanpham?danh_muc_id=7">Lắc tay</a></li>
+                        <li><a class="dropdown-item" href="/sanpham?danh_muc_id=9">Mặt dây chuyền</a></li>
+                        <li><a class="dropdown-item" href="/sanpham?danh_muc_id=10">Nhẫn cưới</a></li>
+                        <li><a class="dropdown-item" href="/sanpham?danh_muc_id=11">Trang sức nam</a></li>
+                        <li><a class="dropdown-item" href="/sanpham?danh_muc_id=6">Trang sức trẻ em</a></li>
+                        <li><a class="dropdown-item" href="/sanpham?danh_muc_id=13">Đồng Hồ</a></li>
+                    </ul>
+                </li>
+
+                <!-- ĐƠN HÀNG -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/lichsu"
+                        <% if (!user) { %>
+                            onclick="alert('Vui lòng đăng nhập!'); window.location.href='/login'; return false;"
+                        <% } %>
+                    >
+                        Đơn hàng
+                    </a>
+                </li>
+
+                <!-- ADMIN (FIX FIELD VaiTro) -->
+                <% if (user && user.VaiTro === "Admin") { %>
+                    <li class="nav-item">
+                        <a class="nav-link text-primary fw-bold" href="/admin">
+                            <i class="bi bi-person-square"></i>
+                        </a>
+                    </li>
+                <% } %>
+
+                <!-- USER -->
+                <% if (user) { %>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown">
+
+                            <!-- FIX: dùng avatar_src từ middleware -->
+                            <img src="/image/<%= user?.anh_dai_dien || 'default.jpg' %>"
+                                class="rounded-circle me-2"
+                                style="width:32px;height:32px;object-fit:cover;border:1px solid #eee;">
+
+                            <span class="d-none d-md-block">
+                                <%= user?.HoTen || 'User' %>
+                            </span>
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/capnhathoso">Hồ sơ của tôi</a>
+                            </li>
+                            <li><a class="dropdown-item text-danger" href="/dangxuat">Đăng xuất</a></li>
+                        </ul>
+                    </li>
+
+                <% } else { %>
+                    <li class="nav-item border-start ms-lg-2 ps-lg-2">
+                        <a class="nav-link" href="/login">
+                            <i class="bi bi-person-circle"></i> Đăng nhập
+                        </a>
+                    </li>
+                <% } %>
+
+                <!-- CART -->
+                <li class="nav-item">
+                    <a href="/giohang" class="nav-link position-relative px-3">
+                        <i class="bi bi-cart3" style="font-size:1.2rem;"></i>
+
+                        <% if (unique_product_count > 0) { %>
+                            <span class="position-absolute top-0 start-100 translate-middle badge bg-danger">
+                                <%= unique_product_count %>
+                            </span>
+                        <% } %>
+                    </a>
+                </li>
+
+                <!-- CONTACT -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/lienhe">
+                        <i class="bi bi-geo-alt"></i>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

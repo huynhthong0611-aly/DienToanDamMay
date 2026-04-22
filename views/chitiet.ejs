@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title><%= product.ten_sp %></title>
+
+    <link rel="stylesheet" href="../css/chitiet.css">
+    <link rel="stylesheet" href="../css/danhgia.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<%- include('menu') %>
+
+<% const safeReturnUrl = returnUrl || '/'; %>
+
+<div class="container mt-5">
+    <div class="row">
+
+        <!-- ẢNH -->
+        <div class="col-md-4">
+            <img src="../image/<%= product.hinh_anh %>" class="img-fluid product-image">
+        </div>
+
+        <!-- INFO -->
+        <div class="col-md-6 product-info">
+            <h2><%= product.ten_sp %></h2>
+            <p class="product-code">Mã: <%= product.ma_sp %></p>
+
+            <% if (product.gia_khuyen_mai && product.gia_khuyen_mai > 0) { %>
+                <p class="price">
+                    <span class="text-decoration-line-through text-muted">
+                        <%= Number(product.gia).toLocaleString('vi-VN') %>đ
+                    </span>
+                    <span class="text-danger fw-bold fs-3">
+                        <%= Number(product.gia_khuyen_mai).toLocaleString('vi-VN') %>đ
+                    </span>
+                </p>
+            <% } else { %>
+                <p class="price fw-bold fs-3 text-danger">
+                    <%= Number(product.gia).toLocaleString('vi-VN') %>đ
+                </p>
+            <% } %>
+
+            <!-- STOCK -->
+            <p>
+                <strong>Số lượng còn lại:</strong>
+                <span id="stock-available">
+                    <%= (sizes && sizes.length > 0 && stock_data)
+                        ? (stock_data[sizes[0]] || 0)
+                        : 0 %>
+                </span> chiếc
+            </p>
+
+            <!-- FORM -->
+            <form method="POST" id="product-form" action="/giohang/add">
+
+                <!-- SIZE -->
+                <div class="size-selector mb-3">
+                    <label class="fw-bold">Chọn Kích cỡ:</label>
+
+                    <div class="btn-group w-100" role="group">
+
+                        <% if (sizes && sizes.length > 0) { %>
+
+                            <% sizes.forEach((s, i) => { 
+                                let stock = (stock_data && stock_data[s]) ? Number(stock_data[s]) : 0;
+                            %>
+
+                                <input type="radio"
+                                    name="size"
+                                    id="size-<%= s %>"
+                                    value="<%= s %>"
+                                    class="btn-check size-radio"
+                                    data-stock="<%= stock %>"
+                                    <%= i === 0 ? 'checked' : '' %>>
+
+                                <label for="size-<%= s %>" class="btn btn-outline-dark">
+                                    <%= s %>
+                                </label>
+
+                            <% }) %>
+
+                        <% } else { %>
+                            <p class="text-danger">Chưa có biến thể</p>
+                        <% } %>
+
+                    </div>
+                </div>
+
+                <!-- QUANTITY -->
+                <div class="quantity-selector mb-3">
+                    <label class="fw-bold">Số lượng:</label>
+
+                    <input type="number"
+                        name="quantity"
+                        value="1"
+                        min="1"
+                        class="form-control w-25"
+                        required>
+                </div>
+
+                <!-- HIDDEN INPUT (NUMBER SYSTEM) -->
+                <input type="hidden" name="product_id" value="<%= product.id %>">
+                <input type="hidden" name="product_name" value="<%= product.ten_sp %>">
+                <input type="hidden" name="product_image" value="<%= product.hinh_anh %>">
+
+                <% let current_price = (product.gia_khuyen_mai > 0) ? product.gia_khuyen_mai : product.gia; %>
+                <input type="hidden" name="product_price" value="<%= current_price %>">
+
+                <!-- BUTTON -->
+                <div class="d-grid gap-2">
+
+                    <!-- THÊM VÀO GIỎ -->
+                    <button type="submit"
+                        class="btn btn-outline-secondary btn-lg"
+                        <% if (!is_logged_in) { %>
+                            onclick="event.preventDefault(); window.location.href='/login?returnUrl=<%= safeReturnUrl %>';"
+                        <% } %>>
+                        Thêm vào giỏ hàng
+                    </button>
+
+                    <!-- MUA NGAY (FIX NUMBER ID) -->
+                    <% if (!is_logged_in) { %>
+
+                        <button type="button"
+                            class="btn btn-danger btn-lg"
+                            onclick="window.location.href='/login?returnUrl=<%= safeReturnUrl %>';">
+                            Mua ngay
+                        </button>
+
+                    <% } else { %>
+
+                        <button type="button"
+                            class="btn btn-danger btn-lg"
+                            onclick="
+                                const size = document.querySelector('input[name=size]:checked')?.value || '';
+                                const qty = document.querySelector('input[name=quantity]').value;
+
+                                window.location.href='/thanhtoan-ngay?id=<%= product.id %>&size=' + size + '&qty=' + qty;
+                            ">
+                            Mua ngay
+                        </button>
+
+                    <% } %>
+
+                </div>
+
+            </form>
+
+            <script>
+            document.getElementById("product-form").addEventListener("submit", function(e) {
+
+                const selectedSize = document.querySelector('input[name="size"]:checked');
+
+                if (!selectedSize) {
+                    e.preventDefault();
+                    alert("Vui lòng chọn kích cỡ");
+                    return;
+                }
+
+                const stock = parseInt(selectedSize.dataset.stock || 0);
+
+                if (stock <= 0) {
+                    e.preventDefault();
+                    alert("Size này đã hết hàng");
+                    return;
+                }
+
+            });
+            </script>
+
+            <script src="../js/soluong.js"></script>
+        </div>
+    </div>
+
+    <!-- TAB -->
+    <div class="mt-5">
+
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#desc">Mô tả</a>
+            </li>
+
+            <% if ([1,10,4,7].includes(product.danh_muc_id)) { %>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#guide">Cách đo size</a>
+                </li>
+            <% } %>
+        </ul>
+
+        <div class="tab-content mt-3 p-3 border">
+
+            <div class="tab-pane fade show active" id="desc">
+                <h3>Mô tả sản phẩm</h3>
+                <p><%= product.mo_ta %></p>
+                <hr>
+
+                <p><strong>Chất liệu:</strong> <%= product.chat_lieu || 'Không có thông tin' %></p>
+                <p><strong>Đá chính:</strong> <%= product.da_chinh || 'Không có thông tin' %></p>
+                <p><strong>Thương hiệu:</strong> <%= thuong_hieu_name %></p>
+                <p><strong>Trọng lượng:</strong> <%= product.trong_luong || 'Không có thông tin' %> kg</p>
+            </div>
+
+            <% if ([1,10,4,7].includes(product.danh_muc_id)) { %>
+                <div class="tab-pane fade" id="guide">
+                    <% if ([1,10].includes(product.danh_muc_id)) { %>
+                        <%- include('sizenhan') %>
+                    <% } else { %>
+                        <%- include('sizevong') %>
+                    <% } %>
+                </div>
+            <% } %>
+
+        </div>
+    </div>
+
+    <!-- LIÊN QUAN -->
+    <div class="related-products mt-5">
+        <h3>Sản phẩm liên quan</h3>
+
+        <div class="carousel-container">
+            <div class="carousel-wrapper">
+                <div class="row flex-nowrap">
+
+                    <% if (result_lienquan && result_lienquan.length > 0) { %>
+
+                        <% result_lienquan.forEach(p => { 
+                            let price = p.gia_khuyen_mai ? p.gia_khuyen_mai : p.gia;
+                        %>
+
+                            <div class="col-md-3">
+                                <a href="/chitiet/<%= p.id %>"
+                                   style="text-decoration: none; color: inherit;">
+                                    <div class="product-card p-2">
+
+                                        <img src="/image/<%= p.hinh_anh %>"
+                                             class="img-fluid">
+
+                                        <h5 class="product-title mt-2">
+                                            <%= p.ten_sp %>
+                                        </h5>
+
+                                        <p class="product-price">
+                                            <%= Number(price).toLocaleString('vi-VN') %>đ
+                                        </p>
+
+                                    </div>
+                                </a>
+                            </div>
+
+                        <% }) %>
+
+                    <% } else { %>
+                        <p>Không có sản phẩm liên quan</p>
+                    <% } %>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<%- include('footer') %>
+
+</body>
+</html>

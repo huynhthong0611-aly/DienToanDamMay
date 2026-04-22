@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Giỏ Hàng</title>
+    <link rel="stylesheet" href="../css/giohang.css">
+</head>
+<body>
+
+<%- include('menu') %>
+
+<div class="cart-container">
+
+    <% if (typeof message !== 'undefined' && message) { %>
+        <p style="color:red; text-align:center;"><%= message %></p>
+    <% } %>
+
+    <div class="cart-left">
+
+        <h2>Giỏ hàng</h2>
+
+        <p>Có <%= cart_items.length %> sản phẩm</p>
+
+         <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Tổng</th>
+                    <th>Xóa</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (locals.cart_items && cart_items.length > 0) { %>
+                    <% cart_items.forEach(item => { %>
+                        <tr>
+                            <td>
+                                 <div class="product-info">
+                                    <img src="/image/<%= item.hinh_anh %>">
+
+                                    <div class="product-text">
+                                        <div class="product-name"><%= item.ten_sp %></div>
+                                        <div class="product-size">Size: <%= item.kich_co %></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><%= item.gia.toLocaleString('vi-VN') %> đ</td>
+                            <td>
+                                <form action="/giohang/update" method="POST">
+                                    <input type="hidden" name="cart_id" value="<%= item.id_bien_the %>">
+                                    <button name="action" value="decrease">-</button>
+                                    <span><%= item.so_luong %></span>
+                                    <button name="action" value="increase">+</button>
+                                </form>
+                            </td>
+                            <td><%= item.subtotal.toLocaleString('vi-VN') %> đ</td>
+                            <td>
+                                <form action="/giohang/delete" method="POST">
+                                    <input type="hidden" name="cart_id" value="<%= item.id_bien_the %>">
+                                    <button>Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr><td colspan="5" style="text-align:center;">Giỏ hàng trống</td></tr>
+                <% } %>
+            </tbody>
+        </table>
+
+        <form action="/thanhtoan" method="GET">
+            <button type="submit">Tiến hành đặt hàng</button>
+        </form>
+
+    </div>
+
+    <div class="cart-right">
+    <h4>Tóm tắt đơn hàng</h4>
+
+    <p>
+        Tổng tiền hàng: 
+        <span id="total-price">
+            <%= Number(total || 0).toLocaleString('vi-VN') %> đ
+        </span>
+    </p>
+
+    <p>
+        Tạm tính: 
+        <span id="subtotal">
+            <%= Number(total || 0).toLocaleString('vi-VN') %> đ
+        </span>
+    </p>
+
+    <p style="color:red; font-size: 1.2em;">
+        Tổng tiền: 
+        <span id="final-total">
+            <%= Number(total || 0).toLocaleString('vi-VN') %> đ
+        </span>
+    </p>
+
+    <button class="btn btn-secondary" onclick="window.location.href='/'">
+        Tiếp Tục Mua Sắm
+    </button>
+</div>
+
+</div>
+
+<%- include('footer') %>
+
+</body>
+</html>

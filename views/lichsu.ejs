@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử mua hàng</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/lichsu.css">
+</head>
+
+<body>
+
+<%- include('menu') %>
+
+<div class="container pb-5 mt-4">
+
+    <% if (!orders || Object.keys(orders).length === 0) { %>
+
+        <div class="text-center p-5 bg-white rounded shadow-sm">
+            <i class="bi bi-bag-x fs-1 text-muted"></i>
+            <p class="mt-2 text-muted">Bạn chưa có đơn hàng nào.</p>
+        </div>
+
+    <% } else { %>
+
+        <% Object.keys(orders).forEach(id => { 
+            let order = orders[id];
+        %>
+
+        <div class="card mb-3 shadow-sm">
+
+            <!-- HEADER -->
+            <div class="card-header bg-white d-flex justify-content-between">
+                <b>Mã đơn: #<%= id %></b>
+                <span class="text-primary">
+                    <%= order.TrangThai %>
+                </span>
+            </div>
+
+            <!-- ITEMS -->
+            <div class="card-body">
+
+                <% order.items.forEach(item => { %>
+
+                <div class="d-flex align-items-center border-bottom py-2">
+
+                    <img src="../image/<%= item.HinhAnh %>"
+                         style="width:70px;height:70px;object-fit:cover"
+                         class="me-3">
+
+                    <div class="flex-grow-1">
+                        <div class="fw-bold"><%= item.Ten %></div>
+                        <div class="text-muted small">
+                            Size: <%= item.KichThuoc %> | SL: x<%= item.SoLuong %>
+                        </div>
+                    </div>
+
+                    <div class="text-danger fw-bold">
+                        <%= Number(item.DonGia).toLocaleString('vi-VN') %>đ
+                    </div>
+
+                </div>
+
+                <% }) %>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="card-footer bg-white d-flex justify-content-between">
+
+                <div class="text-muted small">
+                    📍 <%= order.DiaChi %>
+                </div>
+
+                <div class="fw-bold text-danger">
+                    Tổng: <%= Number(order.TongTien).toLocaleString('vi-VN') %>đ
+                </div>
+
+            </div>
+
+        </div>
+
+        <% }) %>
+
+    <% } %>
+
+</div>
+
+<%- include('footer') %>
+
+</body>
+</html>

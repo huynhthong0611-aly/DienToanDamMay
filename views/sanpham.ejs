@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sản Phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<%- include('menu') %>
+
+<div class="container py-5">
+
+    <h2 class="text-center mb-4">BỘ SƯU TẬP TRANG SỨC</h2>
+
+    <!-- ================= LIST PRODUCT ================= -->
+    <div class="row g-4">
+        <% if (result && result.length > 0) { %>
+            <% result.forEach(row => { %>
+                <div class="col-6 col-md-4" style="width:20%;">
+                    <a href="/chitiet/<%= row._id %>" class="text-decoration-none">
+
+                        <div class="card h-100 shadow-sm">
+
+                            <img 
+                                src="<%= row.hinh_anh.startsWith('http') ? row.hinh_anh : '/image/' + row.hinh_anh %>"
+                                style="height:250px; width:100%; object-fit:cover;"
+                            >
+
+                            <div class="card-body text-center">
+                                <h6><%= row.ten_sp %></h6>
+                                <div class="text-danger fw-bold">
+                                    <%= row.gia.toLocaleString('vi-VN') %>đ
+                                </div>
+                            </div>
+
+                        </div>
+                    </a>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="col-12 text-center">
+                Không có sản phẩm
+            </div>
+        <% } %>
+    </div>
+
+    <!-- ================= PAGINATION FIX ================= -->
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+
+            <%
+                const buildUrl = (p) => {
+                    let url = '/sanpham?page=' + p;
+
+                    if (query?.danh_muc_id) url += '&danh_muc_id=' + query.danh_muc_id;
+                    if (query?.gia) url += '&gia=' + query.gia;
+                    if (query?.chatlieu) url += '&chatlieu=' + query.chatlieu;
+
+                    return url;
+                };
+            %>
+
+            <!-- PREV -->
+            <% if (page > 1) { %>
+                <li class="page-item">
+                    <a class="page-link" href="<%= buildUrl(page - 1) %>">«</a>
+                </li>
+            <% } %>
+
+            <!-- PAGE NUMBER -->
+            <% for (let i = 1; i <= total_pages; i++) { %>
+                <li class="page-item <%= i === page ? 'active' : '' %>">
+                    <a class="page-link" href="<%= buildUrl(i) %>">
+                        <%= i %>
+                    </a>
+                </li>
+            <% } %>
+
+            <!-- NEXT -->
+            <% if (page < total_pages) { %>
+                <li class="page-item">
+                    <a class="page-link" href="<%= buildUrl(page + 1) %>">»</a>
+                </li>
+            <% } %>
+
+        </ul>
+    </nav>
+
+</div>
+
+<%- include('footer') %>
+
+</body>
+</html>

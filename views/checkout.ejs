@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thanh Toán</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-5">
+    <form action="/thanhtoan/confirm" method="POST" class="row">
+        <div class="col-lg-7">
+            <h3>Thông tin thanh toán</h3>
+            <input type="text" name="hoten" class="form-control mb-3" placeholder="Họ và tên" required>
+            <div class="row">
+                <div class="col-md-6"><input type="email" name="email" class="form-control mb-3" placeholder="Email" required></div>
+                <div class="col-md-6"><input type="tel" name="sodienthoai" class="form-control mb-3" placeholder="Số điện thoại" required></div>
+            </div>
+            <textarea name="diachi" class="form-control mb-3" placeholder="Địa chỉ giao hàng" required></textarea>
+            <button type="submit" class="btn btn-primary w-100 mb-2">
+                XÁC NHẬN ĐẶT HÀNG
+            </button>
+
+            <button type="button" class="btn btn-secondary w-100" onclick="history.back()">
+                QUAY LẠI
+            </button>
+        </div>
+
+         <div class="col-lg-5">
+            <div class="card p-4">
+                <h4>Đơn hàng</h4>
+
+                <% items.forEach(item => { %>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        
+                        <!-- Ảnh + tên sản phẩm -->
+                        <div class="d-flex align-items-center">
+                            <img src="/image/<%= item.product_image %>" 
+                            alt="<%= item.product_name %>" 
+                            style="width:60px; height:60px; object-fit:cover; border-radius:8px; margin-right:10px;">
+                                                    
+                            <div>
+                                <div>
+                                    <%= item.product_name %> 
+                                    (Size: <%= item.size %>)
+                                </div>
+                                <small class="text-muted">x <%= item.quantity %></small>
+                            </div>
+                        </div>
+
+                        <!-- Thành tiền -->
+                        <span>
+                            <%= Number(item.subtotal).toLocaleString('vi-VN') %>đ
+                        </span>
+                    </div>
+                <% }) %>
+
+                <hr>
+
+                <div class="d-flex justify-content-between">
+                    <strong>Tổng cộng:</strong>
+                    <h5 class="text-danger">
+                        <%= Number(tong_thanh_toan).toLocaleString('vi-VN') %>đ
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>
