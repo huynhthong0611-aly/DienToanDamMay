@@ -61,6 +61,13 @@ exports.login = async (req, res) => {
 
         req.session.lastEmail = user.Email;
 
+        // ================== CHECK QUYỀN & REDIRECT =================
+        // Nếu là Admin → redirect sang trang admin
+        if (user.VaiTro === 'Admin') {
+            return res.redirect('/admin/dashboard');
+        }
+        
+        // Nếu là User hoặc Khách hàng → redirect sang home
         return res.redirect('/');
 
     } catch (err) {
