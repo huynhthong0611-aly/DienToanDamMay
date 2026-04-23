@@ -53,9 +53,9 @@ exports.getProductDetail = async (req, res) => {
 
         // ================== LIÊN QUAN ==================
         const lienquan = await SanPham.find({
-            danh_muc_id: product.danh_muc_id,
+            danh_muc_id: product.danh_muc_id || 0,
             _id: { $ne: product._id }
-        }).lean();
+        }).limit(4).lean();
 
         // ================== RENDER ==================
         return res.render("chitiet", {
