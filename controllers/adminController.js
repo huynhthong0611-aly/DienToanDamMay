@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const User = require('../models/User');
 const SanPham = require('../models/SanPham');
 const HoaDon = require('../models/HoaDon');
@@ -163,7 +164,13 @@ exports.getProducts = async (req, res) => {
         let filter = {};
 
         if (danh_muc_id && danh_muc_id !== 'all') {
-            filter.danh_muc_id = danh_muc_id;
+            if (mongoose.Types.ObjectId.isValid(danh_muc_id)) {
+                filter.danh_muc_id = new mongoose.Types.ObjectId(danh_muc_id);
+            } else if (!isNaN(danh_muc_id)) {
+                filter.danh_muc_id = Number(danh_muc_id);
+            } else {
+                filter.danh_muc_id = danh_muc_id;
+            }
         }
 
         if (trang_thai && trang_thai !== 'all') {
@@ -252,15 +259,42 @@ exports.addProduct = async (req, res) => {
         });
 
         await newProduct.save();
+        const numericId = Number(id);
 
-        // Tạo biến thể tồn kho mặc định nếu chưa có để sản phẩm hiện trong quản lý tồn kho
-        const existingVariant = await BienThe.findOne({ san_pham_id: Number(id) });
-        if (!existingVariant) {
+        // ================= BIẾN THỂ =================
+        let { sizes, quantities } = req.body;
+
+        // Đảm bảo sizes và quantities là array (trường hợp chỉ có 1 dòng)
+        if (sizes && !Array.isArray(sizes)) {
+            sizes = [sizes];
+            quantities = [quantities];
+        }
+
+        if (sizes && sizes.length > 0) {
+            const lastVariant = await BienThe.findOne().sort({ id: -1 }).lean();
+            let nextVariantId = lastVariant ? lastVariant.id + 1 : 1;
+
+            for (let i = 0; i < sizes.length; i++) {
+                const kichCo = sizes[i] ? sizes[i].trim() : null;
+                const soLuong = Number(quantities[i]) || 0;
+
+                // Chỉ lưu nếu có kích cỡ hoặc số lượng > 0
+                if (kichCo || soLuong > 0) {
+                    await BienThe.create({
+                        id: nextVariantId++,
+                        san_pham_id: numericId,
+                        kich_co: kichCo,
+                        so_luong: soLuong
+                    });
+                }
+            }
+        } else {
+            // Tạo biến thể mặc định nếu không nhập gì
             const lastVariant = await BienThe.findOne().sort({ id: -1 }).lean();
             const nextVariantId = lastVariant ? lastVariant.id + 1 : 1;
             await BienThe.create({
                 id: nextVariantId,
-                san_pham_id: Number(id),
+                san_pham_id: numericId,
                 kich_co: null,
                 so_luong: 0
             });
@@ -286,7 +320,9 @@ exports.editProductForm = async (req, res) => {
         if (!product) return res.send("Sản phẩm không tồn tại");
 
         const categories = await DanhMuc.find({}).lean();
-        res.render("admin/edit-product", { product, categories });
+        const variants = await BienThe.find({ san_pham_id: product.id }).lean();
+
+        res.render("admin/edit-product", { product, categories, variants });
     } catch (err) {
         console.error(err);
         res.status(500).send("Lỗi server");
@@ -327,6 +363,47 @@ exports.updateProduct = async (req, res) => {
                 }
             }
         );
+
+        // ================= UPDATE BIẾN THỂ =================
+        const numericId = currentProduct.id;
+        let { sizes, quantities } = req.body;
+
+        if (sizes && !Array.isArray(sizes)) {
+            sizes = [sizes];
+            quantities = [quantities];
+        }
+
+        // Xóa biến thể cũ và thêm mới (đơn giản nhất)
+        await BienThe.deleteMany({ san_pham_id: numericId });
+
+        if (sizes && sizes.length > 0) {
+            const lastVariant = await BienThe.findOne().sort({ id: -1 }).lean();
+            let nextVariantId = lastVariant ? lastVariant.id + 1 : 1;
+
+            for (let i = 0; i < sizes.length; i++) {
+                const kichCo = sizes[i] ? sizes[i].trim() : null;
+                const soLuong = Number(quantities[i]) || 0;
+
+                if (kichCo || soLuong > 0) {
+                    await BienThe.create({
+                        id: nextVariantId++,
+                        san_pham_id: numericId,
+                        kich_co: kichCo,
+                        so_luong: soLuong
+                    });
+                }
+            }
+        } else {
+            // Tạo biến thể mặc định nếu trống
+            const lastVariant = await BienThe.findOne().sort({ id: -1 }).lean();
+            const nextVariantId = lastVariant ? lastVariant.id + 1 : 1;
+            await BienThe.create({
+                id: nextVariantId,
+                san_pham_id: numericId,
+                kich_co: null,
+                so_luong: 0
+            });
+        }
 
         res.redirect('/admin/products?success=1');
 

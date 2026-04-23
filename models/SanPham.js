@@ -21,7 +21,7 @@ const sanPhamSchema = new mongoose.Schema({
     hinh_anh: String,
 
     danh_muc_id: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.Mixed,
         ref: 'DanhMuc'
     },
     thuong_hieu_id: Number,

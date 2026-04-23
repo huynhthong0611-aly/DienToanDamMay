@@ -7,28 +7,47 @@ const ThuongHieu = require("../models/ThuongHieu");
 exports.getProductDetail = async (req, res) => {
     try {
         const product_id = req.params.id;
+        let product = null;
 
-        // ================== PRODUCT ==================
-        const product = await SanPham.findById(product_id).lean();
+        // ================== PRODUCT LOOKUP ==================
+        // Thử tìm bằng _id (ObjectId)
+        if (mongoose.Types.ObjectId.isValid(product_id)) {
+            product = await SanPham.findById(product_id).lean();
+        }
+
+        // Nếu không tìm thấy hoặc ID không phải ObjectId, thử tìm bằng id (Number)
+        if (!product) {
+            const numericId = Number(product_id);
+            if (!isNaN(numericId)) {
+                product = await SanPham.findOne({ id: numericId }).lean();
+            }
+        }
+
         if (!product) return res.send("Sản phẩm không tồn tại");
 
         // ================== BIẾN THỂ ==================
+        const productIdForVariants = product.id || product.san_pham_id;
         const stockRows = await BienTheSanPham.find({
-            san_pham_id: product.id || product.san_pham_id
+            san_pham_id: productIdForVariants
         }).lean() || [];
 
         let stock_data = {};
         let sizes = [];
 
         stockRows.forEach(r => {
-            const size = String(r.kich_co).trim();
-            stock_data[size] = Number(r.so_luong);
-            sizes.push(size);
+            if (r.kich_co !== null && r.kich_co !== undefined) {
+                const size = String(r.kich_co).trim();
+                stock_data[size] = Number(r.so_luong);
+                sizes.push(size);
+            }
         });
 
-        sizes = [...new Set(sizes)].sort((a, b) => Number(a) - Number(b));
-
-        // danh_muc_id giờ là ObjectId, không cần convert
+        sizes = [...new Set(sizes)].sort((a, b) => {
+            const numA = Number(a);
+            const numB = Number(b);
+            if (isNaN(numA) || isNaN(numB)) return String(a).localeCompare(String(b));
+            return numA - numB;
+        });
 
         // ================== THƯƠNG HIỆU ==================
         let thuong_hieu_name = "Không có thông tin";
@@ -41,9 +60,11 @@ exports.getProductDetail = async (req, res) => {
             }
 
             if (!thuong_hieu) {
-                thuong_hieu = await ThuongHieu.findOne({
-                    ma_thuong_hieu: Number(product.thuong_hieu_id)
-                }).lean();
+                // Sửa: Dùng field 'id' thay vì 'ma_thuong_hieu'
+                const thId = Number(product.thuong_hieu_id);
+                if (!isNaN(thId)) {
+                    thuong_hieu = await ThuongHieu.findOne({ id: thId }).lean();
+                }
             }
 
             if (thuong_hieu) {
@@ -52,10 +73,13 @@ exports.getProductDetail = async (req, res) => {
         }
 
         // ================== LIÊN QUAN ==================
-        const lienquan = await SanPham.find({
-            danh_muc_id: product.danh_muc_id || 0,
-            _id: { $ne: product._id }
-        }).limit(4).lean();
+        let lienquan = [];
+        if (product.danh_muc_id) {
+            lienquan = await SanPham.find({
+                danh_muc_id: product.danh_muc_id,
+                _id: { $ne: product._id }
+            }).limit(4).lean();
+        }
 
         // ================== RENDER ==================
         return res.render("chitiet", {
@@ -65,11 +89,11 @@ exports.getProductDetail = async (req, res) => {
             result_lienquan: lienquan,
             thuong_hieu_name,
             is_logged_in: !!req.session.user,
-            returnUrl: req.originalUrl   // ✅ QUAN TRỌNG
+            returnUrl: req.originalUrl
         });
 
     } catch (err) {
-        console.log("DETAIL ERROR:", err);
-        res.status(500).send("Lỗi server");
+        console.error("DETAIL ERROR:", err);
+        res.status(500).send("Lỗi server: " + err.message);
     }
 };

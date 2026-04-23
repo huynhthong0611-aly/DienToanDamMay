@@ -94,7 +94,64 @@
                                 <label class="form-label">Mô tả</label>
                                 <textarea class="form-control" name="mo_ta" rows="4"></textarea>
                             </div>
+
+                            <!-- BIẾN THỂ (SIZE & SỐ LƯỢNG) -->
+                            <div class="col-12 mt-4">
+                                <h5 class="fw-bold border-bottom pb-2">Biến thể Sản phẩm</h5>
+                                <div id="variant-container">
+                                    <div class="row g-2 mb-2 variant-row">
+                                        <div class="col-md-5">
+                                            <input type="text" class="form-control" name="sizes[]" placeholder="Kích cỡ (VD: 12, 14, S, M)">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <input type="number" class="form-control" name="quantities[]" placeholder="Số lượng tồn kho" value="0">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-outline-danger w-100 remove-variant" onclick="removeVariant(this)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addVariant()">
+                                    <i class="fas fa-plus me-1"></i> Thêm biến thể
+                                </button>
+                            </div>
                         </div>
+
+                        <script>
+                            function addVariant() {
+                                const container = document.getElementById('variant-container');
+                                const newRow = document.createElement('div');
+                                newRow.className = 'row g-2 mb-2 variant-row';
+                                newRow.innerHTML = `
+                                    <div class="col-md-5">
+                                        <input type="text" class="form-control" name="sizes[]" placeholder="Kích cỡ">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input type="number" class="form-control" name="quantities[]" placeholder="Số lượng" value="0">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-outline-danger w-100" onclick="removeVariant(this)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                `;
+                                container.appendChild(newRow);
+                            }
+
+                            function removeVariant(btn) {
+                                const rows = document.querySelectorAll('.variant-row');
+                                if (rows.length > 1) {
+                                    btn.closest('.variant-row').remove();
+                                } else {
+                                    // Nếu chỉ còn 1 dòng, chỉ clear value
+                                    const row = btn.closest('.variant-row');
+                                    row.querySelector('input[name="sizes[]"]').value = '';
+                                    row.querySelector('input[name="quantities[]"]').value = '0';
+                                }
+                            }
+                        </script>
 
                         <div class="d-flex gap-2 justify-content-end mt-4">
                             <a href="/admin/products" class="btn btn-secondary">

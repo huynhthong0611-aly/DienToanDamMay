@@ -183,7 +183,12 @@
                 <a class="nav-link active" data-bs-toggle="tab" href="#desc">Mô tả</a>
             </li>
 
-            <% if ([1,10,4,7].includes(product.danh_muc_id)) { %>
+            <% 
+                const sizeCategoryIds = [1, 10, 4, 7];
+                const currentCatId = product.danh_muc_id ? product.danh_muc_id.toString() : '';
+                const showSizeGuide = sizeCategoryIds.includes(Number(currentCatId));
+                if (showSizeGuide) { 
+            %>
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="tab" href="#guide">Cách đo size</a>
                 </li>
@@ -203,9 +208,9 @@
                 <p><strong>Trọng lượng:</strong> <%= product.trong_luong || 'Không có thông tin' %> kg</p>
             </div>
 
-            <% if ([1,10,4,7].includes(product.danh_muc_id)) { %>
+            <% if (showSizeGuide) { %>
                 <div class="tab-pane fade" id="guide">
-                    <% if ([1,10].includes(product.danh_muc_id)) { %>
+                    <% if ([1, 10].includes(Number(currentCatId))) { %>
                         <%- include('sizenhan') %>
                     <% } else { %>
                         <%- include('sizevong') %>
