@@ -66,9 +66,9 @@ router.get("/users/delete/:id", requireAdmin, adminController.deleteUser);
 // ================= PRODUCTS =================
 router.get("/products", requireAdmin, adminController.getProducts);
 router.get("/products/add", requireAdmin, adminController.addProductForm);
-router.post("/products/add", requireAdmin, adminController.addProduct);
+router.post("/products/add", requireAdmin, upload.single("hinh_anh"), adminController.addProduct);
 router.get("/products/edit/:id", requireAdmin, adminController.editProductForm);
-router.post("/products/edit/:id", requireAdmin, adminController.updateProduct);
+router.post("/products/edit/:id", requireAdmin, upload.single("hinh_anh"), adminController.updateProduct);
 router.get("/products/delete/:id", requireAdmin, adminController.deleteProduct);
 
 // ================= ORDERS =================

@@ -25,7 +25,7 @@
 
             <div class="card">
                 <div class="card-body p-4">
-                    <form method="POST" action="/admin/products/edit/<%= product._id %>">
+                    <form method="POST" action="/admin/products/edit/<%= product._id %>" enctype="multipart/form-data">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Mã SP <span class="text-danger">*</span></label>
@@ -36,6 +36,24 @@
                                 <label class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="ten_sp"
                                        value="<%= product.ten_sp %>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Hình ảnh sản phẩm</label>
+                                <div class="mb-2">
+                                    <% if(product.hinh_anh) { %>
+                                        <img src="/image/<%= product.hinh_anh %>" 
+                                             width="120" height="120" class="rounded border"
+                                             style="object-fit:cover;"
+                                             onerror="this.src='/image/default.jpg'">
+                                    <% } else { %>
+                                        <div class="rounded border bg-light d-flex align-items-center justify-content-center"
+                                             style="width:120px;height:120px;">
+                                            <i class="fas fa-gem fa-2x text-muted"></i>
+                                        </div>
+                                    <% } %>
+                                </div>
+                                <input type="file" class="form-control" name="hinh_anh" accept="image/*">
+                                <small class="text-muted">Định dạng: JPG, PNG. Kích thước tối đa: 5MB</small>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Giá bán <span class="text-danger">*</span></label>
@@ -48,9 +66,18 @@
                                        value="<%= product.gia_khuyen_mai || 0 %>">
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Danh mục ID <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" name="danh_muc_id"
-                                       value="<%= product.danh_muc_id %>" required>
+                                <label class="form-label">Danh mục <span class="text-danger">*</span></label>
+                                <select class="form-select" name="danh_muc_id" required>
+                                    <option value="">-- Chọn danh mục --</option>
+                                    <% if(typeof categories !== 'undefined' && categories.length > 0) { %>
+                                        <% categories.forEach(cat => { %>
+                                            <option value="<%= cat._id %>" 
+                                                <%= product.danh_muc_id?.toString() === cat._id?.toString() ? 'selected' : '' %>>
+                                                <%= cat.ten_danh_muc %>
+                                            </option>
+                                        <% }) %>
+                                    <% } %>
+                                </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Thương hiệu ID</label>

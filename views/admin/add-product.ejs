@@ -29,7 +29,7 @@
                         <div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i><%= error %></div>
                     <% } %>
 
-                    <form method="POST" action="/admin/products/add">
+                    <form method="POST" action="/admin/products/add" enctype="multipart/form-data">
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label">ID Sản phẩm <span class="text-danger">*</span></label>
@@ -43,6 +43,22 @@
                                 <label class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="ten_sp" required>
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Hình ảnh sản phẩm</label>
+                                <input type="file" class="form-control" name="hinh_anh" accept="image/*">
+                                <small class="text-muted">Định dạng: JPG, PNG. Kích thước tối đa: 5MB</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Danh mục <span class="text-danger">*</span></label>
+                                <select class="form-select" name="danh_muc_id" required>
+                                    <option value="">-- Chọn danh mục --</option>
+                                    <% if(typeof categories !== 'undefined' && categories.length > 0) { %>
+                                        <% categories.forEach(cat => { %>
+                                            <option value="<%= cat._id %>"><%= cat.ten_danh_muc %></option>
+                                        <% }) %>
+                                    <% } %>
+                                </select>
+                            </div>
                             <div class="col-md-4">
                                 <label class="form-label">Giá bán <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" name="gia" required>
@@ -50,10 +66,6 @@
                             <div class="col-md-4">
                                 <label class="form-label">Giá khuyến mãi</label>
                                 <input type="number" class="form-control" name="gia_khuyen_mai" value="0">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Danh mục ID <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" name="danh_muc_id" required>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Thương hiệu ID</label>

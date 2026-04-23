@@ -20,7 +20,10 @@ const sanPhamSchema = new mongoose.Schema({
     mo_ta: String,
     hinh_anh: String,
 
-    danh_muc_id: Number,
+    danh_muc_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'DanhMuc'
+    },
     thuong_hieu_id: Number,
 
     trang_thai: { type: Number, default: 0 },

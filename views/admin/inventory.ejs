@@ -92,6 +92,7 @@
                         <!-- Search -->
                         <form method="GET" action="/admin/inventory" class="d-flex gap-2 flex-grow-1">
                             <input type="hidden" name="filter" value="<%= filter %>">
+                            <input type="hidden" name="danh_muc_id" value="<%= typeof danh_muc_id !== 'undefined' ? danh_muc_id : 'all' %>">
                             <input type="text" name="search" class="form-control" style="max-width:280px;"
                                    placeholder="Tìm tên sản phẩm, size..."
                                    value="<%= search %>">
@@ -99,27 +100,43 @@
                                 <i class="fas fa-search"></i>
                             </button>
                             <% if (search) { %>
-                                <a href="/admin/inventory?filter=<%= filter %>" class="btn btn-outline-danger">
+                                <a href="/admin/inventory?filter=<%= filter %>&danh_muc_id=<%= typeof danh_muc_id !== 'undefined' ? danh_muc_id : 'all' %>" class="btn btn-outline-danger">
                                     <i class="fas fa-times"></i>
                                 </a>
                             <% } %>
                         </form>
 
+                        <!-- Category filter -->
+                        <select name="danh_muc_id" class="form-select" style="max-width:180px;" 
+                            onchange="window.location.href='/admin/inventory?filter=<%= filter %>&danh_muc_id=' + this.value + '&search=<%= search %>'">
+                            <option value="all" <%= (typeof danh_muc_id !== 'undefined' && danh_muc_id === 'all') ? 'selected' : '' %>>
+                                Tất cả danh mục
+                            </option>
+                            <% if(typeof categories !== 'undefined' && categories.length > 0) { %>
+                                <% categories.forEach(cat => { %>
+                                    <option value="<%= cat._id %>" 
+                                        <%= (typeof danh_muc_id !== 'undefined' && danh_muc_id == cat._id) ? 'selected' : '' %>>
+                                        <%= cat.ten_danh_muc %>
+                                    </option>
+                                <% }) %>
+                            <% } %>
+                        </select>
+
                         <!-- Filter buttons -->
                         <div class="d-flex gap-1">
-                            <a href="/admin/inventory?filter=all&search=<%= search %>"
+                            <a href="/admin/inventory?filter=all&search=<%= search %>&danh_muc_id=<%= typeof danh_muc_id !== 'undefined' ? danh_muc_id : 'all' %>"
                                class="btn btn-sm btn-outline-secondary filter-btn <%= filter === 'all' ? 'active-filter' : '' %>">
                                 Tất cả (<%= stats.total_variants %>)
                             </a>
-                            <a href="/admin/inventory?filter=out&search=<%= search %>"
+                            <a href="/admin/inventory?filter=out&search=<%= search %>&danh_muc_id=<%= typeof danh_muc_id !== 'undefined' ? danh_muc_id : 'all' %>"
                                class="btn btn-sm btn-outline-danger filter-btn <%= filter === 'out' ? 'active-filter' : '' %>">
                                 <i class="fas fa-times-circle"></i> Hết hàng (<%= stats.out_of_stock %>)
                             </a>
-                            <a href="/admin/inventory?filter=low&search=<%= search %>"
+                            <a href="/admin/inventory?filter=low&search=<%= search %>&danh_muc_id=<%= typeof danh_muc_id !== 'undefined' ? danh_muc_id : 'all' %>"
                                class="btn btn-sm btn-outline-warning filter-btn <%= filter === 'low' ? 'active-filter' : '' %>">
                                 <i class="fas fa-exclamation-triangle"></i> Sắp hết (<%= stats.low_stock %>)
                             </a>
-                            <a href="/admin/inventory?filter=ok&search=<%= search %>"
+                            <a href="/admin/inventory?filter=ok&search=<%= search %>&danh_muc_id=<%= typeof danh_muc_id !== 'undefined' ? danh_muc_id : 'all' %>"
                                class="btn btn-sm btn-outline-success filter-btn <%= filter === 'ok' ? 'active-filter' : '' %>">
                                 <i class="fas fa-check"></i> Còn hàng
                             </a>

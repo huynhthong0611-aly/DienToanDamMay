@@ -28,7 +28,7 @@ exports.getProductDetail = async (req, res) => {
 
         sizes = [...new Set(sizes)].sort((a, b) => Number(a) - Number(b));
 
-        product.danh_muc_id = Number(product.danh_muc_id);
+        // danh_muc_id giờ là ObjectId, không cần convert
 
         // ================== THƯƠNG HIỆU ==================
         let thuong_hieu_name = "Không có thông tin";

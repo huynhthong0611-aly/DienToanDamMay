@@ -30,6 +30,48 @@
                 </div>
             <% } %>
 
+            <!-- SEARCH & FILTER -->
+            <div class="card mb-3">
+                <div class="card-body py-3">
+                    <form method="GET" action="/admin/products" class="d-flex flex-wrap gap-2">
+                        <!-- Search input -->
+                        <input type="text" name="search" class="form-control" style="max-width:200px;"
+                               placeholder="Tìm tên hoặc mã sản phẩm"
+                               value="<%= typeof search !== 'undefined' ? search : '' %>">
+
+                        <!-- Category filter -->
+                        <select name="danh_muc_id" class="form-select" style="max-width:180px;">
+                            <option value="all">Tất cả danh mục</option>
+                            <% if(typeof categories !== 'undefined' && categories.length > 0) { %>
+                                <% categories.forEach(cat => { %>
+                                    <option value="<%= cat._id %>" 
+                                        <%= (typeof danh_muc_id !== 'undefined' && danh_muc_id == cat._id) ? 'selected' : '' %>>
+                                        <%= cat.ten_danh_muc %>
+                                    </option>
+                                <% }) %>
+                            <% } %>
+                        </select>
+
+                        <!-- Status filter -->
+                        <select name="trang_thai" class="form-select" style="max-width:150px;">
+                            <option value="all">Tất cả trạng thái</option>
+                            <option value="1" <%= (typeof trang_thai !== 'undefined' && trang_thai == 1) ? 'selected' : '' %>>Đang bán</option>
+                            <option value="0" <%= (typeof trang_thai !== 'undefined' && trang_thai == 0) ? 'selected' : '' %>>Tạm ẩn</option>
+                        </select>
+
+                        <!-- Search button -->
+                        <button type="submit" class="btn btn-outline-secondary">
+                            <i class="fas fa-search"></i> Lọc
+                        </button>
+
+                        <!-- Reset button -->
+                        <a href="/admin/products" class="btn btn-outline-danger">
+                            <i class="fas fa-redo"></i> Đặt lại
+                        </a>
+                    </form>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-body p-0">
                     <div class="table-responsive">

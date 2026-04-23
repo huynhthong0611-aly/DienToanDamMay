@@ -14,8 +14,15 @@ exports.getSanPham = async (req, res) => {
         const { danh_muc_id, gia, chatlieu } = req.query;
 
         // ================= DANH MỤC =================
-        if (danh_muc_id && !isNaN(danh_muc_id)) {
-            filter.danh_muc_id = Number(danh_muc_id);
+        if (danh_muc_id) {
+            // Nếu là ObjectId string (24 ký tự hex), dùng trực tiếp
+            // Nếu là số, convert thành ObjectId
+            if (/^[0-9a-fA-F]{24}$/.test(danh_muc_id)) {
+                filter.danh_muc_id = danh_muc_id;
+            } else if (!isNaN(danh_muc_id)) {
+                // Legacy: nếu là số, tìm danh mục với id cũ dạng số
+                // Không dùng nữa vì danh_muc_id giờ là ObjectId
+            }
         }
 
         // ================= CHẤT LIỆU =================

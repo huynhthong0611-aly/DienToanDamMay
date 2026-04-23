@@ -13,7 +13,10 @@ const bcrypt = require('bcrypt');
 exports.getUsers = async (req, res) => {
     try {
         const users = await User.find({}).lean();
-        res.render("admin/users", { users });
+        res.render("admin/users", {
+            users,
+            success: req.query.success
+        });
     } catch (err) {
         console.error(err);
         res.status(500).send("Lỗi server");
@@ -38,17 +41,29 @@ exports.addUser = async (req, res) => {
             });
         }
 
+        // Validate dữ liệu bắt buộc
+        if (!HoTen || !Email || !MatKhau) {
+            return res.render("admin/add-user", {
+                error: "Vui lòng điền đầy đủ thông tin bắt buộc"
+            });
+        }
+
         // Hash password
         const hash = await bcrypt.hash(MatKhau, 10);
 
         // Handle avatar upload
         let avatar = 'default.jpg';
         if (req.file) {
-            avatar = req.file.filename; // Lưu tên file được upload
+            avatar = req.file.filename;
         }
+
+        // Tạo ID user tự động (lấy ID lớn nhất + 1)
+        const lastUser = await User.findOne().sort({ Idnguoidung: -1 }).lean();
+        const nextId = lastUser ? lastUser.Idnguoidung + 1 : 1;
 
         // Tạo user mới
         const newUser = new User({
+            Idnguoidung: nextId,
             HoTen,
             Email,
             MatKhau: hash,
@@ -63,7 +78,9 @@ exports.addUser = async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(500).send("Lỗi server");
+        res.render("admin/add-user", {
+            error: "Lỗi server: " + err.message
+        });
     }
 };
 
@@ -142,10 +159,34 @@ exports.deleteUser = async (req, res) => {
 // GET: Danh sách sản phẩm
 exports.getProducts = async (req, res) => {
     try {
-        const products = await SanPham.find({}).sort({ _id: -1 }).limit(50).lean();
+        const { danh_muc_id, trang_thai, search } = req.query;
+        let filter = {};
+
+        if (danh_muc_id && danh_muc_id !== 'all') {
+            filter.danh_muc_id = danh_muc_id;
+        }
+
+        if (trang_thai && trang_thai !== 'all') {
+            filter.trang_thai = Number(trang_thai);
+        }
+
+        if (search) {
+            filter.$or = [
+                { ten_sp: { $regex: search, $options: 'i' } },
+                { ma_sp: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        const products = await SanPham.find(filter).sort({ _id: -1 }).limit(50).lean();
+        const categories = await DanhMuc.find({}).lean();
+
         res.render("admin/products", {
             products,
-            success: req.query.success
+            categories,
+            success: req.query.success,
+            danh_muc_id: danh_muc_id || 'all',
+            trang_thai: trang_thai || 'all',
+            search: search || ''
         });
     } catch (err) {
         console.error(err);
@@ -154,8 +195,14 @@ exports.getProducts = async (req, res) => {
 };
 
 // GET: Form thêm sản phẩm
-exports.addProductForm = (req, res) => {
-    res.render("admin/add-product");
+exports.addProductForm = async (req, res) => {
+    try {
+        const categories = await DanhMuc.find({}).lean();
+        res.render("admin/add-product", { categories });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Lỗi server");
+    }
 };
 
 // POST: Thêm sản phẩm
@@ -166,9 +213,26 @@ exports.addProduct = async (req, res) => {
         // Kiểm tra ID tồn tại
         const exist = await SanPham.findOne({ id: Number(id) });
         if (exist) {
+            const categories = await DanhMuc.find({}).lean();
             return res.render("admin/add-product", {
-                error: "ID sản phẩm đã tồn tại"
+                error: "ID sản phẩm đã tồn tại",
+                categories
             });
+        }
+
+        // Validate danh_muc_id
+        if (!danh_muc_id || danh_muc_id.trim() === '') {
+            const categories = await DanhMuc.find({}).lean();
+            return res.render("admin/add-product", {
+                error: "Vui lòng chọn danh mục",
+                categories
+            });
+        }
+
+        // Lấy tên file ảnh nếu có upload
+        let hinh_anh = null;
+        if (req.file) {
+            hinh_anh = req.file.filename;
         }
 
         const newProduct = new SanPham({
@@ -181,9 +245,10 @@ exports.addProduct = async (req, res) => {
             da_chinh,
             trong_luong: Number(trong_luong),
             mo_ta,
-            danh_muc_id: Number(danh_muc_id),
+            danh_muc_id: danh_muc_id,  // Lưu ObjectId string từ form
             thuong_hieu_id: Number(thuong_hieu_id),
-            trang_thai: Number(req.body.trang_thai) || 1
+            trang_thai: Number(req.body.trang_thai) || 1,
+            hinh_anh
         });
 
         await newProduct.save();
@@ -205,7 +270,11 @@ exports.addProduct = async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(500).send("Lỗi server");
+        const categories = await DanhMuc.find({}).lean();
+        res.render("admin/add-product", {
+            error: "Lỗi server: " + err.message,
+            categories
+        });
     }
 };
 
@@ -216,7 +285,8 @@ exports.editProductForm = async (req, res) => {
         const product = await SanPham.findById(id).lean();
         if (!product) return res.send("Sản phẩm không tồn tại");
 
-        res.render("admin/edit-product", { product });
+        const categories = await DanhMuc.find({}).lean();
+        res.render("admin/edit-product", { product, categories });
     } catch (err) {
         console.error(err);
         res.status(500).send("Lỗi server");
@@ -228,6 +298,15 @@ exports.updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
         const { ten_sp, ma_sp, gia, gia_khuyen_mai, chat_lieu, da_chinh, trong_luong, mo_ta, danh_muc_id, thuong_hieu_id } = req.body;
+
+        // Lấy sản phẩm hiện tại để giữ ảnh cũ nếu không upload ảnh mới
+        const currentProduct = await SanPham.findById(id).lean();
+        let hinh_anh = currentProduct.hinh_anh;
+
+        // Nếu có upload ảnh mới, sử dụng ảnh mới
+        if (req.file) {
+            hinh_anh = req.file.filename;
+        }
 
         await SanPham.updateOne(
             { _id: id },
@@ -241,9 +320,10 @@ exports.updateProduct = async (req, res) => {
                     da_chinh,
                     trong_luong: Number(trong_luong),
                     mo_ta,
-                    danh_muc_id: Number(danh_muc_id),
+                    danh_muc_id: danh_muc_id,  // Lưu ObjectId string
                     thuong_hieu_id: Number(thuong_hieu_id),
-                    trang_thai: Number(req.body.trang_thai)
+                    trang_thai: Number(req.body.trang_thai),
+                    hinh_anh
                 }
             }
         );
@@ -438,11 +518,18 @@ exports.deleteCategory = async (req, res) => {
 // GET: Danh sách tồn kho (nhóm theo sản phẩm)
 exports.getInventory = async (req, res) => {
     try {
-        const { search, filter } = req.query;
+        const { search, filter, danh_muc_id } = req.query;
 
         // Lấy tất cả biến thể kèm thông tin sản phẩm
         let allVariants = await BienThe.find().lean();
         let sanphams = await SanPham.find().lean();
+
+        // Filter theo danh mục nếu có
+        if (danh_muc_id && danh_muc_id !== 'all') {
+            sanphams = sanphams.filter(sp => sp.danh_muc_id?.toString() === danh_muc_id);
+            const spIds = new Set(sanphams.map(sp => sp.id));
+            allVariants = allVariants.filter(v => spIds.has(v.san_pham_id));
+        }
 
         // Map sản phẩm theo id để tra nhanh
         const spMap = {};
@@ -487,12 +574,16 @@ exports.getInventory = async (req, res) => {
             total_quantity: allForStats.reduce((s, v) => s + (v.so_luong || 0), 0)
         };
 
+        const categories = await DanhMuc.find({}).lean();
+
         res.render("admin/inventory", {
             user: req.session.user,
             variants: allVariants,
             stats,
             search: search || '',
-            filter: filter || 'all'
+            filter: filter || 'all',
+            categories,
+            danh_muc_id: danh_muc_id || 'all'
         });
     } catch (err) {
         console.error(err);
