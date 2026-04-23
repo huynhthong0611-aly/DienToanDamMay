@@ -142,8 +142,11 @@ exports.deleteUser = async (req, res) => {
 // GET: Danh sách sản phẩm
 exports.getProducts = async (req, res) => {
     try {
-        const products = await SanPham.find({}).limit(50).lean();
-        res.render("admin/products", { products });
+        const products = await SanPham.find({}).sort({ _id: -1 }).limit(50).lean();
+        res.render("admin/products", {
+            products,
+            success: req.query.success
+        });
     } catch (err) {
         console.error(err);
         res.status(500).send("Lỗi server");
@@ -184,6 +187,20 @@ exports.addProduct = async (req, res) => {
         });
 
         await newProduct.save();
+
+        // Tạo biến thể tồn kho mặc định nếu chưa có để sản phẩm hiện trong quản lý tồn kho
+        const existingVariant = await BienThe.findOne({ san_pham_id: Number(id) });
+        if (!existingVariant) {
+            const lastVariant = await BienThe.findOne().sort({ id: -1 }).lean();
+            const nextVariantId = lastVariant ? lastVariant.id + 1 : 1;
+            await BienThe.create({
+                id: nextVariantId,
+                san_pham_id: Number(id),
+                kich_co: null,
+                so_luong: 0
+            });
+        }
+
         res.redirect('/admin/products?success=1');
 
     } catch (err) {
@@ -524,4 +541,4 @@ exports.importStock = async (req, res) => {
         console.error(err);
         res.status(500).send("Lỗi server");
     }
-};
+};
